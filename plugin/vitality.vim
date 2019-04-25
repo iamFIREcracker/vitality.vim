@@ -41,10 +41,34 @@ if exists('g:vitality_always_assume_iterm') " {{{
 else
     let s:inside_iterm = exists('$ITERM_PROFILE')
 endif " }}}
+if exists('g:vitality_always_assume_mintty') " {{{
+    let s:inside_mintty = 1
+else
+    let s:inside_mintty = exists('$MINTTY')
+endif " }}}
 
 let s:inside_tmux = exists('$TMUX')
 
 " }}}
+
+function! s:SaveRestoreScreenEscapeSequences(cmd) " {{{
+    if s:inside_iterm
+        return a:cmd == 'save' ? "\<Esc>[?1049h" : "\<Esc>[?1049l"
+    elseif s:inside_mintty
+        " Not supported ? XXX
+        return ""
+    endif
+endfunction " }}}
+
+function! s:CursorShapeEscapeSequences(shape) "{{{
+    if s:inside_iterm
+        return "\<Esc>]50;CursorShape=" . a:shape . "\x7"
+    elseif s:inside_mintty
+        " https://github.com/mintty/mintty/wiki/CtrlSeqs#cursor-style
+        let actual_shape = a:shape == 0 ? 1 : a:shape == 1 ? 5 : 3
+        return "\<Esc>[" . actual_shape . " q"
+    endif
+endfunction " }}}
 
 function! s:WrapForTmux(s) " {{{
     " To escape a sequence through tmux:
@@ -72,12 +96,12 @@ function! s:Vitality() " {{{
 
     " These sequences save/restore the screen.
     " They should NOT be wrapped in tmux escape sequences for some reason!
-    let save_screen    = "\<Esc>[?1049h"
-    let restore_screen = "\<Esc>[?1049l"
+    let save_screen    = s:SaveRestoreScreenEscapeSequences('save')
+    let restore_screen = s:SaveRestoreScreenEscapeSequences('restore')
 
-    " These sequences tell iTerm2 to change the cursor shape.
-    let cursor_to_normal = "\<Esc>]50;CursorShape=" . g:vitality_normal_cursor . "\x7"
-    let cursor_to_insert = "\<Esc>]50;CursorShape=" . g:vitality_insert_cursor . "\x7"
+    " These sequences tell the terminal  to change the cursor shape.
+    let cursor_to_normal = s:CursorShapeEscapeSequences(g:vitality_normal_cursor)
+    let cursor_to_insert = s:CursorShapeEscapeSequences(g:vitality_insert_cursor)
 
     if s:inside_tmux
         " Some escape sequences (but not all, lol) need to be properly escaped
@@ -179,6 +203,6 @@ function s:DoCmdFocusGained()
     return cmd
 endfunction
 
-if s:inside_iterm
+if s:inside_iterm || s:inside_mintty
     call s:Vitality()
 endif
