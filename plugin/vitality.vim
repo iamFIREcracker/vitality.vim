@@ -46,6 +46,11 @@ if exists('g:vitality_always_assume_mintty') " {{{
 else
     let s:inside_mintty = exists('$MINTTY')
 endif " }}}
+if exists('g:vitality_always_assume_terminalapp') " {{{
+    let s:inside_terminalapp = 1
+else
+    let s:inside_terminalapp = $TERM_PROGRAM == 'Apple_Terminal'
+endif " }}}
 
 let s:inside_tmux = exists('$TMUX')
 
@@ -57,6 +62,9 @@ function! s:SaveRestoreScreenEscapeSequences(cmd) " {{{
     elseif s:inside_mintty
         " Not supported ? XXX
         return ""
+    elseif s:inside_terminalapp
+        " Not supported ? XXX
+        return ""
     endif
 endfunction " }}}
 
@@ -66,6 +74,10 @@ function! s:CursorShapeEscapeSequences(shape) "{{{
     elseif s:inside_mintty
         " https://github.com/mintty/mintty/wiki/CtrlSeqs#cursor-style
         let actual_shape = a:shape == 0 ? 1 : a:shape == 1 ? 5 : 3
+        return "\<Esc>[" . actual_shape . " q"
+    elseif s:inside_terminalapp
+        " https://vt100.net/docs/vt510-rm/DECSCUSR
+        let actual_shape = a:shape == 0 ? 2 : a:shape == 1 ? 5 : 3
         return "\<Esc>[" . actual_shape . " q"
     endif
 endfunction " }}}
@@ -198,6 +210,6 @@ function s:DoCmdFocusGained()
     return cmd
 endfunction
 
-if s:inside_iterm || s:inside_mintty
+if s:inside_iterm || s:inside_mintty || s:inside_terminalapp
     call s:Vitality()
 endif

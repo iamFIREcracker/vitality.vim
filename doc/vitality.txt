@@ -23,18 +23,20 @@
 ==============================================================================
 CONTENTS                                                   *vitality-contents*
 
-    1. Overview and Usage ................... |VitalityOverview|
-    2. Configuration ........................ |VitalityConfig|
-        2.1 g:vitality_fix_cursor ........... |vitality_fix_cursor|
-        2.2 g:vitality_normal_cursor ........ |vitality_normal_cursor|
-        2.3 g:vitality_insert_cursor ........ |vitality_insert_cursor|
-        2.4 g:vitality_fix_focus ............ |vitality_fix_focus|
-        2.5 g:vitality_always_assume_iterm .. |vitality_always_assume_iterm|
-    3. How it Works ......................... |VitalityHow|
-    4. License .............................. |VitalityLicense|
-    5. Bugs ................................. |VitalityBugs|
-    6. Contributing ......................... |VitalityContributing|
-    7. Changelog ............................ |VitalityChangelog|
+    1. Overview and Usage ........................ |VitalityOverview|
+    2. Configuration ............................. |VitalityConfig|
+        2.1 g:vitality_fix_cursor ................ |vitality_fix_cursor|
+        2.2 g:vitality_normal_cursor ............. |vitality_normal_cursor|
+        2.3 g:vitality_insert_cursor ............. |vitality_insert_cursor|
+        2.4 g:vitality_fix_focus ................. |vitality_fix_focus|
+        2.5 g:vitality_always_assume_iterm ....... |vitality_always_assume_iterm|
+        2.6 g:vitality_always_assume_mintty....... |vitality_always_assume_mintty|
+        2.7 g:vitality_always_assume_terminalapp.. |vitality_always_assume_terminalapp|
+    3. How it Works .............................. |VitalityHow|
+    4. License ................................... |VitalityLicense|
+    5. Bugs ...................................... |VitalityBugs|
+    6. Contributing .............................. |VitalityContributing|
+    7. Changelog ................................. |VitalityChangelog|
 
 ==============================================================================
 1. Overview and Usage                       *VitalityOverview* *VitalityUsage*
@@ -66,6 +68,8 @@ You can tweak the behavior of Vitality by setting a few variables in your
     let g:vitality_insert_cursor = 1
     let g:vitality_fix_focus = 0
     let g:vitality_always_assume_iterm = 1
+    let g:vitality_always_assume_mintty = 1
+    let g:vitality_always_assume_terminalapp = 1
 
 You might also need to add some configuration to your tmux setup. Later
 versions of tmux (>= 1.9) have Focus events disabled by default. Add the
@@ -126,6 +130,38 @@ Warning: if you set this to true and you run Vim from a terminal other
 than iTerm, it certainly will not work, and you may even get strange output.
 
 Default: depends on the existence of $ITERM_PROFILE.
+
+------------------------------------------------------------------------------
+2.6 g:vitality_always_assume_mintty            *vitality_always_assume_mintty*
+
+By default, Vitality only enables Mintty-specific features when $MINTTY
+is present in your environment. However, this value is not preserved once
+you have connected by ssh to another system. If you only use Mintty, you can
+tell Vim to always assume Mintty features will work.
+
+Set this to 1 if you want Vitality to always assume it is running in Mintty.
+
+Warning: if you set this to true and you run Vim from a terminal other
+than Mintty, it certainly will not work, and you may even get strange output.
+
+Default: depends on the existence of $MINTTY.
+
+------------------------------------------------------------------------------
+2.7 g:vitality_always_assume_terminalapp  *vitality_always_assume_terminalapp*
+
+By default, Vitality only enables Terminal.app-specific features when
+$TERM_PROGRAM is present in your environment, and equal to 'Apple_Terminal'.
+However, this value is not preserved once you have connected by ssh to another
+system. If you only use Terminal.app, you can tell Vim to always assume
+Terminal.app features will work.
+
+Set this to 1 if you want Vitality to always assume it is running in
+Terminal.app.
+
+Warning: if you set this to true and you run Vim from a terminal other than
+Terminal.app, it certainly will not work, and you may even get strange output.
+
+Default: depends on the existence of $TERM_PROGRAM.
 
 ==============================================================================
 3. How it Works                                                  *VitalityHow*
